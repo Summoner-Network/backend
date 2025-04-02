@@ -1,0 +1,2 @@
+cargo:rerun-if-changed=build.rs
+cargo:rustc-env=DEBUG_OUTPUT_DIR=/Users/egd/internal/invoke-os/server/target/debug/build/wasmtime-component-macro-291ab3b020be4d8d/out

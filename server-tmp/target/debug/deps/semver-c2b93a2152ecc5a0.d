@@ -1,0 +1,13 @@
+/Users/egd/internal/invoke-os/server/target/debug/deps/libsemver-c2b93a2152ecc5a0.rmeta: /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/lib.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/backport.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/display.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/error.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/eval.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/identifier.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/impls.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/parse.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/serde.rs
+
+/Users/egd/internal/invoke-os/server/target/debug/deps/semver-c2b93a2152ecc5a0.d: /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/lib.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/backport.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/display.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/error.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/eval.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/identifier.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/impls.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/parse.rs /Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/serde.rs
+
+/Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/lib.rs:
+/Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/backport.rs:
+/Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/display.rs:
+/Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/error.rs:
+/Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/eval.rs:
+/Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/identifier.rs:
+/Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/impls.rs:
+/Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/parse.rs:
+/Users/egd/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-1.0.26/src/serde.rs:

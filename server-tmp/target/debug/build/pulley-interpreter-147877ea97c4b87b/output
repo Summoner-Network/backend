@@ -1,0 +1,2 @@
+cargo:rustc-cfg=has_provenance_apis
+cargo:rustc-check-cfg=cfg(has_provenance_apis)
