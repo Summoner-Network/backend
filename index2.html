@@ -1,0 +1,117 @@
+<!doctype html>
+<html data-n-head-ssr>
+<head>
+  <title>Rock Paper Scissors with AI</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script src="https://unpkg.com/brain.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <style>
+    .history {
+      max-height: 120px;
+      overflow-y: auto;
+      border: 1px solid #e2e8f0;
+      padding: 4px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="max-w-5xl mx-auto flex flex-col lg:flex-row justify-evenly items-start">
+    <div class="text-center lg:mt-10">
+      <h1 class="text-3xl font-bold text-indigo-500">Rock Paper Scissors</h1>
+      <h2 class="text-base text-indigo-500">With Artificial Intelligence</h2>
+
+      <div class="my-6">
+        <h2 class="text-2xl font-semibold text-indigo-500">Score</h2>
+        <div class="flex justify-evenly mt-4">
+          <div>
+            <p id="humanScore" class="text-3xl text-indigo-500">0</p>
+            <p class="mt-2 text-xl">Human</p>
+            <ul id="humanHistory" class="mt-4 text-gray-600 history"></ul>
+          </div>
+          <div>
+            <p id="aiScore" class="text-3xl text-indigo-500">0</p>
+            <p class="mt-2 text-xl">AI</p>
+            <ul id="aiHistory" class="mt-4 text-gray-600 history"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 flex justify-center">
+        <button onclick="play('Rock')" class="px-4 py-2 m-2 bg-red-500 text-white rounded hover:bg-red-600">Rock</button>
+        <button onclick="play('Paper')" class="px-4 py-2 m-2 bg-green-500 text-white rounded hover:bg-green-600">Paper</button>
+        <button onclick="play('Scissors')" class="px-4 py-2 m-2 bg-blue-500 text-white rounded hover:bg-blue-600">Scissors</button>
+      </div>
+
+      <button onclick="resetGame()" class="px-4 py-2 m-2 border rounded text-indigo-500">Reset</button>
+
+      <p id="gameCount" class="mt-8">Game count: 0</p>
+    </div>
+
+    <div class="lg:ml-16 p-4 mt-4 prose">
+      <h2>What is this?</h2>
+      <p>This is a rock-paper-scissors game that uses AI to predict your moves based on your patterns.</p>
+      <h2>How to play</h2>
+      <ol>
+        <li>Choose rock, paper, or scissors.</li>
+        <li>Keep playing to create a pattern.</li>
+        <li>The AI will try to predict your next move.</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    let humanScore = 0;
+    let aiScore = 0;
+    let gameCount = 0;
+
+    function play(humanChoice) {
+      const choices = ['Rock', 'Paper', 'Scissors'];
+      const aiChoice = choices[Math.floor(Math.random() * 3)];
+
+      let winner;
+
+      if (humanChoice === aiChoice) {
+        winner = 'Draw';
+      } else if (
+        (humanChoice === 'Rock' && aiChoice === 'Scissors') ||
+        (humanChoice === 'Paper' && aiChoice === 'Rock') ||
+        (humanChoice === 'Scissors' && aiChoice === 'Paper')
+      ) {
+        humanScore++;
+        winner = 'Human';
+        document.getElementById('humanScore').textContent = humanScore;
+      } else {
+        aiScore++;
+        winner = 'AI';
+        document.getElementById('aiScore').textContent = aiScore;
+      }
+
+      updateHistory('humanHistory', humanChoice, winner === 'Human');
+      updateHistory('aiHistory', aiChoice, winner === 'AI');
+
+      gameCount++;
+      document.getElementById('gameCount').textContent = 'Game count: ' + gameCount;
+    }
+
+    function updateHistory(elementId, move, won) {
+      const historyElement = document.getElementById(elementId);
+      const newMove = document.createElement('li');
+      newMove.innerHTML = won ? `<strong>${move}</strong>` : move;
+      historyElement.prepend(newMove);
+    }
+
+    function resetGame() {
+      humanScore = 0;
+      aiScore = 0;
+      gameCount = 0;
+      document.getElementById('humanScore').textContent = humanScore;
+      document.getElementById('aiScore').textContent = aiScore;
+      document.getElementById('gameCount').textContent = 'Game count: 0';
+      document.getElementById('humanHistory').innerHTML = '';
+      document.getElementById('aiHistory').innerHTML = '';
+    }
+  </script>
+</body>
+</html>
