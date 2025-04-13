@@ -2,6 +2,7 @@ mod structs;
 mod __invoke__;
 mod __deploy__;
 mod bytemath;
+mod globals;
 
 use anyhow::{Result, anyhow};
 use std::{thread, time::Duration};

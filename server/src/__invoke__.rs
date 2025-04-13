@@ -1,9 +1,11 @@
 use crate::structs::AppState;
+use crate::globals::get_pc;
 
 use actix_web::{web, HttpResponse, Responder};
 use library::{InputExt, Invoke};
 use serde_json::{json, Value};
 use std::sync::Arc;
+
 
 #[derive(serde::Deserialize)]
 pub struct InvokeRequest {
@@ -32,7 +34,7 @@ pub async fn invoke_handler(
     let contractions = invokes.contract();
     let mut results = vec![];
     for contraction in contractions {
-        let response = InvokeResponse { emit: json!(state.invoke(0, contraction).await) };
+        let response = InvokeResponse { emit: json!(state.invoke(get_pc(), contraction).await) };
         results.push(response);
     }
 
