@@ -17,9 +17,9 @@ pub struct AppState {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ContractContext {
-    contract_id: bytea,
-    call_id: u64,
-    rand_id: u64,
+    pub contract_id: bytea,
+    pub call_id: u64,
+    pub rand_id: u64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -143,7 +143,7 @@ impl AppState {
         //    returning the output length.  (Adjust to fit your real contract code!)
         //
         let invoke_func = match instance
-            .get_typed_func::<(i32, i32), i32>(&mut store, "_invoke")
+            .get_typed_func::<(i32, i32), i32>(&mut store, "enter_contract")
         {
             Ok(f) => f,
             Err(e) => {

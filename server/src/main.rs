@@ -4,18 +4,17 @@ mod __deploy__;
 mod bytemath;
 
 use anyhow::{Result, anyhow};
-use std::{sync::Arc, thread, time::Duration};
+use std::{thread, time::Duration};
 
 use __invoke__::invoke_handler;
 use __deploy__::deploy_contract;
 use structs::{AppState, ContractContext, ContractSetArg};
-use actix_web::{web::{self, Data}, App, HttpResponse, HttpServer, Responder};
+use actix_web::{web::{self, Data}, App, HttpServer};
 use pqcrypto_dilithium::dilithium2;
-use deadpool_postgres::{Config, ManagerConfig, Pool, RecyclingMethod};
+use deadpool_postgres::{Config, ManagerConfig, RecyclingMethod};
 use tokio_postgres::NoTls;
-use wasmtime::{Caller, Engine, Linker, Memory};
-use rand::RngCore;
-use wasmtime::Config as WASMConfig;
+use wasmtime::{Caller, Engine, Linker};
+use rand::{RngCore, SeedableRng, rngs::StdRng};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -77,13 +76,13 @@ async fn main() -> std::io::Result<()> {
         linker: None,
     };
 
+    // The linker requires the DB pool so we initialize it afterwards.
     let linker = create_linker(&state);
     state.linker = Some(linker.expect("Linker error!"));
 
     // Run the HTTP server with the /invoke endpoint.
     HttpServer::new(move || {
         App::new()
-            // If needed, share the pool with your handlers:
             .app_data(Data::new(state.clone()))
             .route("/deploy", web::post().to(deploy_contract))
             .route("/invoke", web::post().to(invoke_handler))
@@ -113,8 +112,26 @@ pub fn create_linker(state: &AppState) -> Result<Linker<ContractContext>> {
             .ok_or_else(|| anyhow!("Failed to find `memory` export"))?;
 
         // Generate 32 bytes of randomness.
+        // Retrieve the contract context from the caller.
+        let context: &mut ContractContext = caller.data_mut();
+
+        // Create a 32-byte seed from call_id and rand_id.
+        let mut seed = [0u8; 32];
+        // Copy call_id (8 bytes) into the first 8 bytes of the seed.
+        seed[..8].copy_from_slice(&context.call_id.to_le_bytes());
+        // Copy rand_id (8 bytes) into the next 8 bytes of the seed.
+        seed[8..16].copy_from_slice(&context.rand_id.to_le_bytes());
+        // The remaining 16 bytes can be left as zeros or further populated if needed.
+
+        // Initialize a deterministic RNG using the seed.
+        let mut rng = StdRng::from_seed(seed);
+
+        // Generate 32 random bytes.
         let mut rand_buf = [0u8; 32];
-        rand::rng().fill_bytes(&mut rand_buf);
+        rng.fill_bytes(&mut rand_buf);
+
+        // Increment the random index (rand_id) for subsequent calls.
+        context.rand_id += 1;
 
         // Write them into guest memory.
         memory.write(&mut caller, out_ptr as usize, &rand_buf)
