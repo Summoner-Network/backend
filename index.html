@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FREYA - The Financial Test Network</title>
+  <style>
+    /* Base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+      font-size: 62.5%;
+    }
+    
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      color: #fff;
+      line-height: 1.6;
+      background: #000;
+      overflow-x: hidden;
+    }
+    
+    /* Typography */
+    h1 {
+      font-size: 7rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+    
+    h2 {
+      font-size: 3.5rem;
+      font-weight: 300;
+      margin-bottom: 2rem;
+      letter-spacing: 0.05em;
+    }
+    
+    h3 {
+      font-size: 4.2rem;
+      letter-spacing: 0.05em;
+      margin: 1rem 0;
+      font-weight: 800;
+    }
+    
+    p {
+      font-size: 2.2rem;
+      max-width: 800px;
+      margin: 2rem auto;
+      line-height: 1.7;
+    }
+    
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    nav ul {
+      display: flex;
+      justify-content: center;
+      list-style: none;
+      padding: 2rem;
+    }
+    
+    nav ul li {
+      margin: 0 2rem;
+    }
+    
+    nav ul li a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.8rem;
+      font-weight: 700;
+      transition: all 0.3s;
+      padding: 1rem 2rem;
+      border-radius: 3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    
+    nav ul li a:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Section layouts */
+    section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem;
+      opacity: 0;
+      transform: translateY(50px);
+      animation: fadeIn 1.2s forwards;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .container {
+      max-width: 1400px;
+      text-align: center;
+      z-index: 10;
+    }
+    
+    /* Animation delays */
+    section:nth-of-type(1) { animation-delay: 0.2s; }
+    section:nth-of-type(2) { animation-delay: 0.4s; }
+    section:nth-of-type(3) { animation-delay: 0.6s; }
+    section:nth-of-type(4) { animation-delay: 0.8s; }
+    section:nth-of-type(5) { animation-delay: 1s; }
+    
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Unique section styles */
+    #landing {
+      background: linear-gradient(135deg, #1a237e, #d50000, #ffab00);
+      background-size: 400% 400%;
+      animation: gradientBG 10s ease infinite, fadeIn 1.2s forwards;
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    #landing::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2" x="0" y="0" width="100" height="100"/></svg>');
+      background-size: 50px 50px;
+      opacity: 0.3;
+    }
+    
+    #tech {
+      background: linear-gradient(to bottom, #000, #1a1a2e);
+    }
+    
+    #tech::before {
+      content: "";
+      position: absolute;
+      width: 300%;
+      height: 100%;
+      top: 0;
+      left: -100%;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(30, 144, 255, 0.1),
+        rgba(30, 144, 255, 0.1) 20px,
+        rgba(0, 0, 0, 0.1) 20px,
+        rgba(0, 0, 0, 0.1) 40px
+      );
+      transform: rotate(-5deg);
+    }
+    
+    #batch {
+      background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+      overflow: hidden;
+    }
+    
+    #batch .grid-visual {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+      background-size: 50px 50px;
+      z-index: 1;
+    }
+    
+    #batch::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 50%, rgba(125, 0, 255, 0.4), transparent 60%);
+      z-index: 0;
+    }
+    
+    #security {
+      background: linear-gradient(to right, #000428, #004e92);
+      position: relative;
+    }
+    
+    .quantum-particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.2);
+      animation: float 8s infinite ease-in-out;
+    }
+    
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0) scale(1);
+        opacity: 0;
+      }
+      50% {
+        transform: translateY(-150px) translateX(150px) scale(1.5);
+        opacity: 0.9;
+      }
+    }
+    
+    #future {
+      background: linear-gradient(to bottom, #000000, #130f40);
+      color: #fff;
+    }
+    
+    #future .hexagon-grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.2;
+      background-size: 60px 104px;
+      background-image:
+        linear-gradient(
+          to right,
+          transparent 18px,
+          #fff 18px,
+          #fff 22px,
+          transparent 22px
+        ),
+        linear-gradient(
+          to bottom,
+          transparent 30px,
+          #fff 30px,
+          #fff 34px,
+          transparent 34px
+        ),
+        linear-gradient(
+          to right,
+          transparent 18px,
+          #fff 18px,
+          #fff 22px,
+          transparent 22px
+        ),
+        linear-gradient(
+          to bottom,
+          transparent 30px,
+          #fff 30px,
+          #fff 34px,
+          transparent 34px
+        ),
+        linear-gradient(
+          to bottom right,
+          transparent 42px,
+          #fff 42px,
+          #fff 46px,
+          transparent 46px
+        ),
+        linear-gradient(
+          to bottom left,
+          transparent 42px,
+          #fff 42px,
+          #fff 46px,
+          transparent 46px
+        );
+    }
+    
+    /* Feature highlights */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 4rem;
+      margin-top: 5rem;
+    }
+    
+    .feature-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4rem 3rem;
+      border-radius: 2rem;
+      backdrop-filter: blur(10px);
+      transition: transform 0.4s, box-shadow 0.4s;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .feature-icon {
+      font-size: 6rem;
+      margin-bottom: 2rem;
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+    }
+    
+    .feature-title {
+      font-size: 2.8rem;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+    
+    .feature-desc {
+      font-size: 1.8rem;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.6;
+    }
+    
+    /* Call to action */
+    .cta-btn {
+      display: inline-block;
+      margin-top: 4rem;
+      padding: 1.8rem 4rem;
+      font-size: 2rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      background: linear-gradient(90deg, #ffab00, #d50000);
+      border: none;
+      border-radius: 5rem;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .cta-btn:hover {
+      transform: translateY(-7px);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .cta-btn::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: rgba(255, 255, 255, 0.1);
+      transform: rotate(45deg);
+      transition: transform 0.6s;
+      z-index: -1;
+    }
+    
+    .cta-btn:hover::after {
+      transform: rotate(45deg) translate(50%, 50%);
+    }
+    
+    /* Timeline highlight */
+    .timeline {
+      position: relative;
+      max-width: 1200px;
+      margin: 7rem auto;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1000px) {
+      html {
+        font-size: 55%;
+      }
+      
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      nav ul {
+        flex-wrap: wrap;
+      }
+      
+      nav ul li {
+        margin: 0.5rem;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      html {
+        font-size: 50%;
+      }
+      
+      section {
+        padding: 2rem;
+      }
+      
+      h1 {
+        font-size: 5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav>
+    <ul>
+      <li><a href="#landing">FREYA</a></li>
+      <li><a href="#tech">Architecture</a></li>
+      <li><a href="#batch">Convolutional Processing</a></li>
+      <li><a href="#security">Quantum Security</a></li>
+      <li><a href="#future">Roadmap</a></li>
+    </ul>
+  </nav>
+  
+  <!-- Landing Section -->
+  <section id="landing">
+    <div class="container">
+      <h1>FREYA</h1>
+      <h2>The Financial Test Network</h2>
+      <p>A next-generation smart contracting platform revolutionizing financial transactions with post-quantum security and convolutional batch processing.</p>
+      <h3>Launch: January 2026</h3>
+      <a href="#tech" class="cta-btn">Discover The Technology</a>
+    </div>
+  </section>
+  
+  <!-- Architecture Section -->
+  <section id="tech">
+    <div class="container">
+      <h1>Rust-Powered Architecture</h1>
+      <h2>Built for speed, reliability, and security</h2>
+      <p>Our platform leverages the power of Rust to deliver uncompromising performance with memory safety guarantees.</p>
+      
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3 class="feature-title">Asynchronous Core</h3>
+          <p class="feature-desc">Built with Tokio for maximum scalability and efficient resource utilization</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📦</div>
+          <h3 class="feature-title">WebAssembly Execution</h3>
+          <p class="feature-desc">Smart contracts compile to Wasm for predictable, secure execution across environments</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🔄</div>
+          <h3 class="feature-title">Concurrent Processing</h3>
+          <p class="feature-desc">Parallelized transaction handling for unprecedented throughput</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Batch Processing Section -->
+  <section id="batch">
+    <div class="grid-visual"></div>
+    <div class="container">
+      <h1>Convolutional Smart Contracts</h1>
+      <h2>Revolutionary Batch Processing</h2>
+      <p>Unlike traditional platforms that process transactions individually, FREYA's convolutional approach flattens and processes multiple invocations as a single unit, dramatically improving performance.</p>
+      
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🚀</div>
+          <h3 class="feature-title">10x Throughput</h3>
+          <p class="feature-desc">Process batches of transactions concurrently for exponential performance gains</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">⚖️</div>
+          <h3 class="feature-title">Efficient Netting</h3>
+          <p class="feature-desc">Automatically consolidate and optimize related transactions</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3 class="feature-title">Global State View</h3>
+          <p class="feature-desc">Smart contracts can analyze and respond to entire batches of transactions at once</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Security Section -->
+  <section id="security">
+    <div class="quantum-particles">
+      <div class="particle" style="top: 20%; left: 30%;"></div>
+      <div class="particle" style="top: 70%; left: 80%;"></div>
+      <div class="particle" style="top: 40%; left: 60%;"></div>
+      <div class="particle" style="top: 80%; left: 20%;"></div>
+      <div class="particle" style="top: 30%; left: 70%;"></div>
+      <div class="particle" style="top: 60%; left: 40%;"></div>
+      <div class="particle" style="top: 50%; left: 10%;"></div>
+      <div class="particle" style="top: 10%; left: 50%;"></div>
+      <div class="particle" style="top: 15%; left: 25%;"></div>
+      <div class="particle" style="top: 85%; left: 75%;"></div>
+      <div class="particle" style="top: 45%; left: 55%;"></div>
+      <div class="particle" style="top: 75%; left: 15%;"></div>
+    </div>
+    <div class="container">
+      <h1>Post-Quantum Security</h1>
+      <h2>Future-Proofed For The Quantum Age</h2>
+      <p>FREYA implements post-quantum cryptographic algorithms to secure transactions against both current and future threats, including quantum computing attacks.</p>
+      
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🔐</div>
+          <h3 class="feature-title">Dilithium Signatures</h3>
+          <p class="feature-desc">Lattice-based cryptography resistant to quantum computing attacks</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <h3 class="feature-title">Multi-layer Protection</h3>
+          <p class="feature-desc">Defense-in-depth approach with multiple security mechanisms</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🔄</div>
+          <h3 class="feature-title">Adaptable Security</h3>
+          <p class="feature-desc">Flexible cryptographic framework that can evolve with emerging threats</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Future Section -->
+  <section id="future">
+    <div class="hexagon-grid"></div>
+    <div class="container">
+      <h1>The Future of Financial Networks</h1>
+      <h2>Reimagining Smart Contracts</h2>
+      <p>FREYA stands at the intersection of high-performance computing and financial innovation, creating a platform where contract execution is no longer a bottleneck but a strategic advantage.</p>
+      
+      <div class="timeline">
+        <div class="feature-grid">
+          <div class="feature-card">
+            <h3 class="feature-title">January 2026</h3>
+            <p class="feature-desc">Public testnet launch with core convolutional features and post-quantum security</p>
+          </div>
+          
+          <div class="feature-card">
+            <h3 class="feature-title">Q2 2026</h3>
+            <p class="feature-desc">Advanced contract libraries and development toolchain release</p>
+          </div>
+          
+          <div class="feature-card">
+            <h3 class="feature-title">Q4 2026</h3>
+            <p class="feature-desc">Enterprise integration APIs and full-scale production network</p>
+          </div>
+        </div>
+      </div>
+      
+      <a href="#" class="cta-btn">Join The Revolution</a>
+    </div>
+  </section>
+
+  <script>
+    // Add floating quantum particle effect
+    document.addEventListener('DOMContentLoaded', () => {
+      const particles = document.querySelectorAll('.particle');
+      particles.forEach((particle, index) => {
+        particle.style.animationDelay = `${index * 0.5}s`;
+      });
+      
+      // Add parallax effect for feature cards
+      const cards = document.querySelectorAll('.feature-card');
+      window.addEventListener('mousemove', (e) => {
+        const x = e.clientX / window.innerWidth;
+        const y = e.clientY / window.innerHeight;
+        
+        cards.forEach((card) => {
+          const cardRect = card.getBoundingClientRect();
+          const cardCenterX = cardRect.left + cardRect.width / 2;
+          const cardCenterY = cardRect.top + cardRect.height / 2;
+          
+          const distanceX = (e.clientX - cardCenterX) / 30;
+          const distanceY = (e.clientY - cardCenterY) / 30;
+          
+          if (isElementInViewport(card)) {
+            card.style.transform = `translateY(-5px) perspective(800px) rotateY(${distanceX * 0.1}deg) rotateX(${-distanceY * 0.1}deg)`;
+          }
+        });
+      });
+      
+      function isElementInViewport(el) {
+        const rect = el.getBoundingClientRect();
+        return (
+          rect.top >= 0 &&
+          rect.left >= 0 &&
+          rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+          rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
+      }
+    });
+  </script>
+</body>
+</html>
