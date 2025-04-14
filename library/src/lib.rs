@@ -355,14 +355,14 @@ pub struct Output {
 #[derive(Serialize, Deserialize)]
 pub struct Invoke {
     identity: Vec<u8>,
-    payload: InvokePayload
+    pub payload: InvokePayload
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct InvokePayload {
     contract: Vec<u8>,
     function: String,
-    argument: Value
+    pub argument: Value
 }
 
 // Define an extension trait to add the `contract` method.

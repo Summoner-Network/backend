@@ -3,6 +3,7 @@ mod __invoke__;
 mod __deploy__;
 mod bytemath;
 mod globals;
+mod batches;
 
 use anyhow::{Result, anyhow};
 use std::{thread, time::Duration};
