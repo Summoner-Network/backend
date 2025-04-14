@@ -5,12 +5,13 @@ use actix_web::{
 };
 use std::fmt::Debug;
 use serde_json::json;
-use library::{Invoke, Input};
+use library::Input;
 use crate::{
     AppState,
     create_linker,
     deploy_contract,
     invoke_handler,
+    __invoke__::InvokeRequest,
 };
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -126,18 +127,14 @@ async fn test_deploy_and_invoke_workflow() {
         .and_then(|v| v.as_str())
         .expect("Expected contract_hash in deploy response");
 
-    let batch_input = vec![
-        Input {
-            contract: hex::decode(contract_hash).unwrap(),
-            functions: {
-                let mut m = HashMap::new();
-                m.insert("enter_contract".to_string(), vec![json!({
-                    "call": {}
-                })]);
-                m
-            }
+    let batch_input = vec![Input {
+        contract: hex::decode(contract_hash).unwrap(),
+        functions: {
+            let mut m = HashMap::new();
+            m.insert("enter_contract".to_string(), vec![json!({})]);
+            m
         }
-    ];
+    }];
 
     let invoke_req = test::TestRequest::post()
         .uri("/invoke")
@@ -226,18 +223,18 @@ async fn test_invoke_invalid_function() {
     let contract_hash = deploy_body["contract_hash"].as_str()
         .expect("Expected contract_hash in deploy response");
 
+    let batch_input = vec![Input {
+        contract: hex::decode(contract_hash).unwrap(),
+        functions: {
+            let mut m = HashMap::new();
+            m.insert("non_existent_function".to_string(), vec![json!({})]);
+            m
+        }
+    }];
+
     let invoke_req = test::TestRequest::post()
         .uri("/invoke")
-        .set_json(vec![Input {
-            contract: hex::decode(contract_hash).unwrap(),
-            functions: {
-                let mut m = HashMap::new();
-                m.insert("non_existent_function".to_string(), vec![json!({
-                    "call": {}
-                })]);
-                m
-            }
-        }])
+        .set_json(&batch_input)
         .to_request();
 
     let resp = test::call_service(&app, invoke_req).await;
@@ -277,18 +274,18 @@ async fn test_deploy_invalid_wasm() {
 async fn test_invoke_nonexistent_contract() {
     let app = test::init_service(setup_test_app().await).await;
 
+    let batch_input = vec![Input {
+        contract: hex::decode("deadbeef").unwrap(),
+        functions: {
+            let mut m = HashMap::new();
+            m.insert("some_function".to_string(), vec![json!({})]);
+            m
+        }
+    }];
+
     let req = test::TestRequest::post()
         .uri("/invoke")
-        .set_json(vec![Input {
-            contract: hex::decode("deadbeef").unwrap(),
-            functions: {
-                let mut m = HashMap::new();
-                m.insert("some_function".to_string(), vec![json!({
-                    "call": {}
-                })]);
-                m
-            }
-        }])
+        .set_json(&batch_input)
         .to_request();
 
     let resp = test::call_service(&app, req).await;
