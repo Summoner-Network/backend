@@ -1,6 +1,3 @@
-cargo build --target wasm32-unknown-unknown --release
-cargo build --target wasm32-wasip1 --release
-
 To build the RPS contract (located in the `contract-rps` folder) as a WebAssembly module using the `wasm32-unknown-unknown` target, you can follow these steps:
 
 ---
