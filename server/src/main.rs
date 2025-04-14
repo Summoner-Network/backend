@@ -1,6 +1,7 @@
 mod structs;
 mod __invoke__;
 mod __deploy__;
+mod invoke_batcher;
 mod bytemath;
 mod globals;
 mod batches;

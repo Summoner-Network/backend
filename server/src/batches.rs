@@ -7,7 +7,7 @@ use tokio::sync::mpsc::{self, UnboundedReceiver, UnboundedSender};
 /// An awaitable slot that will eventually yield a result of type `R`.
 ///
 /// This wraps a oneshot receiver that will complete when a result is sent.
-pub struct AwaitSlot<R>(oneshot::Receiver<R>);
+pub struct AwaitSlot<R>(pub oneshot::Receiver<R>);
 
 impl<R> AwaitSlot<R> {
     /// Awaits the result from the oneshot channel.
