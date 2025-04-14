@@ -1,4 +1,3 @@
-![](summoner-logo.png)
 # InvokeOS
 
 ![InvokeOS Logo](summoner-logo.png)
