@@ -273,3 +273,6 @@ pub fn create_linker(state: &AppState) -> Result<Linker<ContractContext>> {
 
     Ok(linker)
 }
+
+#[cfg(test)]
+mod tests;
