@@ -1,5 +1,0 @@
-[workspace]
-members = [ "library", "server", "macros", "contract-rps"]
-
-# Optional: Use resolver version 2 for better workspace support
-resolver = "2"
