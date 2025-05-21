@@ -9,13 +9,13 @@ syntax = "proto3";
 package brother;
 
 message Object {
-  string type = 1;
+  int32 type = 1;
   int64 id = 2;
   map<string, string> attributes = 3;
 }
 
 message Association {
-  string type = 1;
+  int32 type = 1;
   int64 source_id = 2;
   int64 target_id = 3;
   int64 time = 4;
@@ -24,7 +24,7 @@ message Association {
 }
 
 message GetObjectRequest {
-  string type = 1;
+  int32 type = 1;
   int64 id = 2;
 }
 
@@ -41,7 +41,7 @@ message PutObjectResponse {
 }
 
 message RemoveObjectRequest {
-  string type = 1;
+  int32 type = 1;
   int64 id = 2;
 }
 
@@ -58,7 +58,7 @@ message CreateAssociationResponse {
 }
 
 message RemoveAssociationRequest {
-  string type = 1;
+  int32 type = 1;
   int64 source_id = 2;
   int64 target_id = 3;
 }
@@ -68,7 +68,7 @@ message RemoveAssociationResponse {
 }
 
 message GetAssociationsRequest {
-  string type = 1;
+  int32 type = 1;
   int64 source_id = 2;
   int64 position_over = 3; // For pagination
   int32 limit = 4;
