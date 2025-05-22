@@ -1,0 +1,6 @@
+# Dev keeps the simple creds; no extra container needed.
+services:
+  yb:
+    environment:
+      YSQL_USER: yugabyte
+      YSQL_PASSWORD: yugabyte

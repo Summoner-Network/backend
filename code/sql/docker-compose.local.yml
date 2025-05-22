@@ -1,0 +1,12 @@
+# code/sql/docker-compose.local.yml
+services:
+  yb:
+    image: yugabytedb/yugabyte:latest
+    env_file: .env
+    ports:
+      - "5433:5433"
+      - "7000:7000"
+    volumes:
+      - yb_data:/var/lib/ybd
+volumes:
+  yb_data: {}

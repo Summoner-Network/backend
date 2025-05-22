@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  yb:
+    image: yugabytedb/yugabyte:latest
+    restart: unless-stopped
+
+    command:
+      - bin/yugabyted
+      - start
+      - --daemon=false
+      - --base_dir=/var/lib/ybd
+      - --listen=0.0.0.0
+      - --advertise_address=0.0.0.0
+      - --ysql_port=5433
+      - --ui=false
+      # authentication is off by default; prod overlay turns it on
+      # - --ysql_enable_auth
+
+    ports:
+      - "5433:5433"        # host → container YSQL
+      - "7000:7000"        # optional master UI
+
+    volumes:
+      - yb_data:/var/lib/ybd
+
+volumes:
+  yb_data: {}
