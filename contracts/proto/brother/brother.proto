@@ -11,11 +11,12 @@ package brother;
 message Object {
   int32 type = 1;
   int64 id = 2;
-  map<string, string> attributes = 3;
+  int32 version = 3;
+  map<string, string> attributes = 4;
 }
 
 message Association {
-  int32 type = 1;
+  string type = 1;
   int64 source_id = 2;
   int64 target_id = 3;
   int64 time = 4;
