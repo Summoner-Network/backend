@@ -11,7 +11,8 @@ package brother;
 message Object {
   int32 type = 1;
   int64 id = 2;
-  map<string, string> attributes = 3;
+  int32 version = 3;
+  map<string, string> attributes = 4;
 }
 
 message Association {
