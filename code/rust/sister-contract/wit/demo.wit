@@ -1,0 +1,119 @@
+// SPDX-License-Identifier: Apache-2.0
+package brother:guest@1.6.0;
+
+/* ───── shared definitions ───── */
+interface common {
+    /* helpers */
+    type signer = string;
+    type multisigner = list<signer>;
+    type digest = string;
+    record header  { key: string, value: string }
+    type   headers = list<header>;
+    type sub-id  = u64;
+
+    /* strong-ids */
+    record ckey { id: u64 }
+    record fkey { contract: ckey, function: string }
+    record ekey { contract: ckey, topic: string }
+    record okey { otype: u32, id: u64 }
+    record akey { atype: string, src-id: u64, tar-id: u64}
+
+    /* core records */
+    record object      { key: okey, version: u32, attributes: headers }
+    record association { key: akey, time: u64, position: u64, attributes: headers }
+
+    /* RPC envelopes */
+    record get-object-request          { key: okey }
+    record get-object-response         { object: option<object> }
+    record put-object-request          { object: object }
+    record put-object-response         { success: bool, id: u64 }
+    record remove-object-request       { key: okey }
+    record remove-object-response      { success: bool }
+    record create-association-request  { association: association }
+    record create-association-response { success: bool }
+    record remove-association-request  { key: akey }
+    record remove-association-response { success: bool }
+    record get-associations-request    { key: akey, above: u64, limit: u32 }
+    record get-associations-response   { associations: list<association> }
+}
+
+/* ───── TAO service ───── */
+interface tao {
+    use common.{
+        get-object-request,  get-object-response,
+        put-object-request,  put-object-response,
+        remove-object-request, remove-object-response,
+        create-association-request, create-association-response,
+        remove-association-request, remove-association-response,
+        get-associations-request,  get-associations-response
+    };
+
+    get-object:         func(req: get-object-request)         -> get-object-response;
+    put-object:         func(req: put-object-request)         -> put-object-response;
+    remove-object:      func(req: remove-object-request)      -> remove-object-response;
+    create-association: func(req: create-association-request) -> create-association-response;
+    remove-association: func(req: remove-association-request) -> remove-association-response;
+    get-associations:   func(req: get-associations-request)   -> get-associations-response;
+}
+
+/* ───── host utilities ───── */
+interface event-sink {
+    use common.{object};
+    emit: func(topic: string, payload: object);
+}
+
+interface pubsub {
+    use common.{ekey, fkey, akey, sub-id};
+    subscribe:   func(source: ekey, target: fkey, argument: akey) -> sub-id;
+    unsubscribe: func(id: sub-id);
+}
+
+interface scheduler {
+    use common.{fkey, okey};
+    schedule: func(repeater: string, target: fkey, argument: okey);
+}
+
+interface inference {
+    use common.{object};
+    enum infer-error { MODEL-NOT-FOUND, INVALID-INPUT, INTERNAL }
+    infer: func(model: string, input: object) -> result<object, infer-error>;
+}
+
+interface http {
+    use common.{headers};
+
+    enum method { GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS }
+    record request  { method: method, url: string, headers: headers, body: headers }
+    record response { status: u16, headers: headers, body: string }
+    enum http-error { NETWORK, TIMEOUT, DNS, TLS, INTERNAL }
+
+    fetch: func(req: request) -> result<response, http-error>;
+}
+
+interface context {
+    use common.{multisigner, digest};
+
+    signers: func() -> multisigner;
+    noreplay: func() -> digest;
+    time: func() -> u64;
+}
+
+/* ───── contract entrypoint ───── */
+interface contract {
+    use common.{signer, headers};
+    deploy: func(payload: headers);
+    render: func(routing: string) -> string;
+    invoke: func(method: string, payload: headers) -> result<headers, u64>;
+}
+
+/* ───── world definition ───── */
+world demo {
+    import tao;
+    import event-sink;
+    import pubsub;
+    import scheduler;
+    import inference;
+    import http;
+
+    export contract;
+}

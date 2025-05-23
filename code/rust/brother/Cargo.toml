@@ -11,12 +11,17 @@ publish.workspace = true
 
 [dependencies]
 tonic = "0.13.1"
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 prost = "0.13.5"
 prost-types = "0.13.5"
 tracing = "0.1"
-tracing-subscriber = "0.3"
+tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
 async-trait = "0.1"          # <── for the service impl
+sqlx = { version = "0.8.6", features = [ "postgres", "runtime-tokio-native-tls", "macros", "migrate" ] }
+serde_json        = "1.0"
+anyhow            = "1"
+dotenvy = "0.15.7"
+wasmtime = { version = "33.0.0", features = ["component-model", "async"] }
 
 [build-dependencies]
 tonic-build = "0.13.1"

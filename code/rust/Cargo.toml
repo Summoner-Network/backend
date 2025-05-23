@@ -1,11 +1,11 @@
 [workspace]
-members = ["brother"]          # add more crates here later
+members = ["brother", "sister", "sister-contract"]          # add more crates here later
 resolver = "2"                 # modern dependency resolver
 
 [workspace.package]            # common metadata (optional)
-authors    = ["Econia Labs <developers@econialabs.com>"]
-license    = "Business Source License"
-homepage   = "https://www.econialabs.com/"
-repository = "https://github.com/econia-labs/econia"
+authors    = ["Summoner <info@summoner.org>"]
+license    = "Apache-2.0"
+homepage   = "https://www.summoner.org/"
+repository = "https://github.com/Summoner-Network/backend"
 edition    = "2021"
 publish    = false

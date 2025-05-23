@@ -9,24 +9,26 @@ syntax = "proto3";
 package brother;
 
 message Object {
-  int32 type = 1;
-  int64 id = 2;
-  int32 version = 3;
-  map<string, string> attributes = 4;
+  uint32 tenant = 1;
+  uint32 type = 2;
+  uint64 id = 3;
+  uint32 version = 4;
+  map<string, string> attributes = 5;
 }
 
 message Association {
-  string type = 1;
-  int64 source_id = 2;
-  int64 target_id = 3;
-  int64 time = 4;
-  int64 position = 5;
-  map<string, string> attributes = 6;
+  uint32 tenant = 1;
+  string type = 2;
+  uint64 source_id = 3;
+  uint64 target_id = 4;
+  uint64 time = 5;
+  uint64 position = 6;
+  map<string, string> attributes = 7;
 }
 
 message GetObjectRequest {
-  int32 type = 1;
-  int64 id = 2;
+  uint32 otype = 1;
+  uint64 id = 2;
 }
 
 message GetObjectResponse {
@@ -39,11 +41,12 @@ message PutObjectRequest {
 
 message PutObjectResponse {
   bool success = 1;
+  uint64 id = 2;
 }
 
 message RemoveObjectRequest {
-  int32 type = 1;
-  int64 id = 2;
+  uint32 otype = 1;
+  uint64 id = 2;
 }
 
 message RemoveObjectResponse {
@@ -59,9 +62,10 @@ message CreateAssociationResponse {
 }
 
 message RemoveAssociationRequest {
-  int32 type = 1;
-  int64 source_id = 2;
-  int64 target_id = 3;
+  uint32 otype = 1;
+  uint64 src_id = 2;
+  string atype = 3;
+  uint64 tar_tid = 4;
 }
 
 message RemoveAssociationResponse {
@@ -69,10 +73,12 @@ message RemoveAssociationResponse {
 }
 
 message GetAssociationsRequest {
-  int32 type = 1;
-  int64 source_id = 2;
-  int64 position_over = 3; // For pagination
-  int32 limit = 4;
+  uint32 otype = 1;
+  uint64 src_id = 2;
+  string atype = 3;
+  uint64 tar_id = 4; 
+  uint64 above = 5; // For pagination
+  uint32 limit = 6;
 }
 
 message GetAssociationsResponse {

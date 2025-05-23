@@ -1,11 +1,22 @@
 # code/sql/docker-compose.local.yml
 services:
   yb:
-    image: yugabytedb/yugabyte:latest
-    env_file: .env
+    image: yugabytedb/yugabyte:2.25.2.0-b359-aarch64   # explicit tag
+    platform: linux/arm64                    # keep on Apple-silicon
+    restart: unless-stopped
+    command:
+      - bin/yugabyted
+      - start
+      - --daemon=false
+      - --base_dir=/var/lib/ybd
+      - --listen=0.0.0.0
+      - --advertise_address=0.0.0.0
+      - --ui=false
+      - --master_flags=rpc_bind_addresses=0.0.0.0:7100
+      - --tserver_flags=rpc_bind_addresses=0.0.0.0:9100,pgsql_proxy_bind_address=0.0.0.0:5433,ysql_sequence_cache_minval=10000
     ports:
-      - "5433:5433"
-      - "7000:7000"
+      - "5433:5433"   # YSQL
+      - "7000:7000"   # master UI
     volumes:
       - yb_data:/var/lib/ybd
 volumes:
