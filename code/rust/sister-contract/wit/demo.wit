@@ -4,6 +4,7 @@ package brother:guest@1.6.0;
 /* ───── shared definitions ───── */
 interface common {
     /* helpers */
+    type bytes = list<u8>;
     type signer = string;
     type multisigner = list<signer>;
     type digest = string;

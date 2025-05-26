@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content="FinanceMachines – ultra‑low‑latency payments infrastructure for autonomous systems." />
+    <meta name="theme-color" content="#0a0a0a" />
+    <title>FinanceMachines – Finance for the Machine Economy</title>
+
+    <!-- Inter font (fallbacks to system UI) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+
+    <style>
+      /* ─── CSS Custom Properties ─────────────────────────────── */
+      :root {
+        --c-bg-1: #0a0a0a;
+        --c-bg-2: #1a1a2e;
+        --c-bg-3: #16213e;
+        --c-primary: #00ff88;
+        --c-accent: #00d4ff;
+        --c-text: #ffffff;
+        --c-muted: #b0b0b0;
+      }
+
+      /* ─── Reset / base ──────────────────────────────────────── */
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: 'Inter', system-ui, sans-serif;
+        background: var(--c-bg-1);
+        color: var(--c-text);
+        line-height: 1.5;
+        overflow-x: hidden;
+      }
+      a {
+        color: inherit;
+      }
+
+      /* ─── Layout helpers ────────────────────────────────────── */
+      .container {
+        width: min(90rem, 92%);
+        margin-inline: auto;
+      }
+      .section {
+        padding: clamp(4rem, 10vw, 8rem) 0;
+      }
+
+      /* ─── Animated background ───────────────────────────────── */
+      .bg-anim {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: linear-gradient(45deg, var(--c-bg-1), var(--c-bg-2), var(--c-bg-3));
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+      }
+      .bg-anim::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 50% 50%, rgba(0, 255, 136, 0.15) 0%, transparent 50%);
+        animation: pulse 4s ease-in-out infinite;
+      }
+      @keyframes gradientShift {
+        0%, 100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 0.6;
+        }
+      }
+
+      /* ─── Header / nav ─────────────────────────────────────── */
+      header {
+        position: sticky;
+        top: 0;
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        z-index: 10;
+      }
+      .nav {
+        height: 4.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .logo {
+        font-weight: 800;
+        font-size: 1.375rem;
+        background: linear-gradient(135deg, var(--c-primary), var(--c-accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+      }
+      .nav-links a {
+        position: relative;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .nav-links a::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -0.25rem;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(135deg, var(--c-primary), var(--c-accent));
+        transition: width 0.3s;
+      }
+      .nav-links a:hover::after {
+        width: 100%;
+      }
+
+      /* mobile nav */
+      #nav-toggle {
+        display: none;
+      }
+      .hamburger {
+        display: none;
+        flex-direction: column;
+        gap: 4px;
+        cursor: pointer;
+      }
+      .hamburger span {
+        width: 24px;
+        height: 2px;
+        background: var(--c-text);
+        transition: transform 0.3s;
+      }
+      @media (max-width: 48rem) {
+        .nav-links {
+          position: fixed;
+          inset: 0 0 0 auto;
+          flex-direction: column;
+          padding: 5rem 4rem;
+          background: rgba(10, 10, 10, 0.9);
+          transform: translateX(100%);
+          transition: transform 0.3s ease;
+        }
+        .nav-links.open {
+          transform: translateX(0);
+        }
+        .hamburger {
+          display: flex;
+        }
+      }
+
+      /* ─── Hero ─────────────────────────────────────────────── */
+      .hero {
+        text-align: center;
+      }
+      .hero h1 {
+        font-size: clamp(2.5rem, 6vw, 5rem);
+        font-weight: 800;
+        line-height: 1.1;
+        background: linear-gradient(135deg, #ffffff, var(--c-primary), var(--c-accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 24px rgba(0, 255, 136, 0.25));
+        animation: titleGlow 6s ease-in-out infinite alternate;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .hero h1 {
+          animation: none;
+        }
+      }
+      @keyframes titleGlow {
+        from {
+          filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.3));
+        }
+        to {
+          filter: drop-shadow(0 0 40px rgba(0, 212, 255, 0.4));
+        }
+      }
+      .subtitle {
+        max-width: 50ch;
+        margin-inline: auto;
+        margin-top: 1rem;
+        color: var(--c-muted);
+        font-size: 1.125rem;
+      }
+
+      /* ─── Stats ────────────────────────────────────────────── */
+      .stats-grid {
+        margin-top: 4rem;
+        display: grid;
+        gap: 2rem;
+        grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+      }
+      .stat-card {
+        position: relative;
+        padding: 2.5rem 2rem;
+        border-radius: 1.25rem;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: transform 0.3s, border-color 0.3s;
+      }
+      .stat-card:hover {
+        transform: translateY(-6px);
+        border-color: var(--c-primary);
+      }
+      .stat-number {
+        font-size: 2.75rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--c-primary), var(--c-accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .stat-label {
+        margin-top: 0.25rem;
+        font-weight: 600;
+      }
+      .stat-desc {
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--c-muted);
+      }
+
+      /* ─── CTA ─────────────────────────────────────────────── */
+      .cta {
+        text-align: center;
+      }
+      .btn {
+        position: relative;
+        display: inline-block;
+        margin-top: 2.5rem;
+        padding: 1rem 2.5rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 3rem;
+        cursor: pointer;
+        background: linear-gradient(135deg, var(--c-primary), var(--c-accent));
+        color: #000;
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+      .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 1rem 2rem rgba(0, 255, 136, 0.35);
+      }
+
+      /* ─── Features ─────────────────────────────────────────── */
+      .features h2 {
+        text-align: center;
+        font-size: clamp(2rem, 5vw, 3rem);
+        background: linear-gradient(135deg, #ffffff, var(--c-primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .features-grid {
+        margin-top: 3.5rem;
+        display: grid;
+        gap: 2.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+      }
+      .feature-card {
+        padding: 2rem;
+        border-radius: 1.25rem;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: transform 0.3s, border-color 0.3s;
+      }
+      .feature-card:hover {
+        transform: translateY(-6px);
+        border-color: var(--c-primary);
+      }
+      .feature-icon {
+        display: grid;
+        place-items: center;
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 0.75rem;
+        font-size: 1.5rem;
+        background: linear-gradient(135deg, var(--c-primary), var(--c-accent));
+        margin-bottom: 1rem;
+      }
+      .feature-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+      }
+      .feature-desc {
+        margin-top: 0.5rem;
+        font-size: 0.95rem;
+        color: var(--c-muted);
+      }
+
+      /* ─── Footer placeholder ──────────────────────────────── */
+      footer {
+        padding: 3rem 0;
+        text-align: center;
+        font-size: 0.875rem;
+        color: var(--c-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-anim" aria-hidden="true"></div>
+
+    <!-- ─── Header ──────────────────────────────────────────── -->
+    <header>
+      <div class="container nav" aria-label="Main navigation">
+        <a class="logo" href="#top">Incredible Machines, Inc</a>
+
+        <input type="checkbox" id="nav-toggle" hidden />
+        <label for="nav-toggle" class="hamburger" aria-label="Toggle navigation" aria-haspopup="true" aria-controls="primary-navigation">
+          <span></span><span></span><span></span>
+        </label>
+
+        <nav id="primary-navigation" class="nav-links" role="navigation">
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#docs">Docs</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- ─── Hero ────────────────────────────────────────────── -->
+    <section class="section hero" id="top">
+      <div class="container">
+        <h1>Finance for Machines</h1>
+        <p class="subtitle">The fastest financial infrastructure built for autonomous systems.<br><b>Process >1M transactions per second at unbeatable scale.</b></p>
+
+        <div class="stats-grid" aria-label="Platform stats">
+          <div class="stat-card">
+            <span class="stat-number" data-target="1000000" data-format="short">0</span>
+            <p class="stat-label">Exchanges / second</p>
+            <p class="stat-desc">Real‑time processing at machine speed</p>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" data-target="0.001" data-format="currency">0</span>
+            <p class="stat-label">Cost / transfer</p>
+            <p class="stat-desc">Ultra‑low fees for high‑frequency trading</p>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" data-target="100.00" data-format="percent">0</span>
+            <p class="stat-label">Uptime guarantee</p>
+            <p class="stat-desc">Enterprise‑grade reliability</p>
+          </div>
+        </div>
+
+        <div class="cta">
+          <a class="btn" href="#">Start building today</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Features ────────────────────────────────────────── -->
+    <section class="section features" id="features">
+      <div class="container">
+        <h2>Built for the Machine Economy</h2>
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <p class="feature-title">Lightning fast</p>
+            <p class="feature-desc">Process millions of payments per second with sub‑millisecond latency. Ideal for high‑frequency trading and real‑time settlement.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <p class="feature-title">AI‑native</p>
+            <p class="feature-desc">Purpose‑built APIs for autonomous agents, smart contracts, and ML systems. No human in the loop required.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">🔐</div>
+            <p class="feature-title">Ultra‑secure</p>
+            <p class="feature-desc">TLS 1.3 everywhere, hardware signing, and zero‑knowledge proofs keep every bit bullet‑proof.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">🌐</div>
+            <p class="feature-title">Global scale</p>
+            <p class="feature-desc">Infrastructure spanning 50+ regions with automatic failover and Anycast routing for truly global uptime.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">📊</div>
+            <p class="feature-title">Real‑time analytics</p>
+            <p class="feature-desc">Built‑in observability and ML‑driven insights help you optimize flows before they bottleneck.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">🔄</div>
+            <p class="feature-title">Instant settlement</p>
+            <p class="feature-desc">Settlement finality achieved in under 500 µs—no more waiting windows.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      © <span id="year"></span> FinanceMachines • All rights reserved
+    </footer>
+
+    <!-- ─── Scripts ─────────────────────────────────────────── -->
+    <script>
+      /* year footer */
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      /* mobile nav toggle */
+      const checkbox = document.getElementById('nav-toggle');
+      checkbox.addEventListener('change', () => {
+        document.querySelector('.nav-links').classList.toggle('open', checkbox.checked);
+      });
+
+      /* stat counter animation */
+      const options = { threshold: 0.6 };
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          animate(el);
+          obs.unobserve(el);
+        });
+      }, options);
+
+      document.querySelectorAll('.stat-number').forEach(el => observer.observe(el));
+
+      function animate(el) {
+        const target = parseFloat(el.dataset.target);
+        const format = el.dataset.format;
+        const duration = 2000;
+        const start = performance.now();
+        const step = now => {
+          const progress = Math.min((now - start) / duration, 1);
+          let value = target * progress;
+          switch (format) {
+            case 'currency':
+              el.textContent = value.toLocaleString(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 3 });
+              break;
+            case 'percent':
+              el.textContent = value.toFixed(2) + '%';
+              break;
+            default: // short (e.g., 1M)
+              el.textContent = Math.floor(value).toLocaleString();
+          }
+          if (progress < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }
+    </script>
+  </body>
+</html>

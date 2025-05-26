@@ -1,12 +1,12 @@
 /*======================================================================
-  TAO core schema  –  multi-tenant objects  +  associations
+  TAO core schema  –  multi-tenant objects + associations
   ----------------------------------------------------------------------
-  • Adds mandatory tenant BIGINT to every row
-  • Compatible with PostgreSQL ≥ 12 and YugabyteDB ≥ 2.17 (YSQL layer)
-  • Idempotent: CREATE … IF NOT EXISTS everywhere
-  • Uses optimistic concurrency via the `version` column
-  • All balances / counters stored as BIGINT for audit-friendliness
-  • Free-form attrs are kept in JSONB (binary JSON) so GIN indexes work
+  • tenant (BIGINT) is part of every PK
+  • BIGSERIAL auto-generates object IDs (caller may pass NULL/0)
+  • Optimistic concurrency via the `version` column
+  • JSONB attrs + GIN indexes for schemaless search
+  • Compatible with PostgreSQL ≥ 12 and YugabyteDB ≥ 2.17 (YSQL)
+  • Idempotent: every DDL uses IF NOT EXISTS / OR REPLACE
 ======================================================================*/
 
 -----------------------------------------------------------------------
@@ -17,21 +17,21 @@ SET search_path TO tao, public;
 
 -----------------------------------------------------------------------
 -- 2. Objects
---    PK = (tenant, type, id) — “type” is a small-int enum, id is a 64-bit snowflake
+--    PK = (tenant, type, id)  where id is BIGSERIAL
 -----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS objects (
-    tenant      BIGINT  NOT NULL,        -- ⬅ multi-tenant key
-    type        INT     NOT NULL,
-    id          BIGINT  NOT NULL,
-    version     INT     NOT NULL DEFAULT 0,
-    attributes  JSONB   NOT NULL DEFAULT '{}'::jsonb,
+    tenant      BIGINT      NOT NULL,
+    type        INT         NOT NULL,
+    id          BIGSERIAL   NOT NULL,
+    version     INT         NOT NULL DEFAULT 0,
+    attributes  JSONB       NOT NULL DEFAULT '{}'::jsonb,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
 
     CONSTRAINT objects_pk PRIMARY KEY (tenant, type, id)
 );
 
--- Bump updated_at + optimistic version on change
+-- Touch trigger: bump updated_at + version on every UPDATE
 CREATE OR REPLACE FUNCTION trg_objects_touch()
 RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
@@ -50,79 +50,84 @@ EXECUTE FUNCTION trg_objects_touch();
 -----------------------------------------------------------------------
 -- 3. Associations
 --    PK = (tenant, type, source_id, target_id)
---    Secondary key = (tenant, type, source_id, position) for fast paging
+--    Secondary = (tenant, type, source_id, position) for fast paging
 -----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS associations (
-    tenant      BIGINT  NOT NULL,        -- ⬅ multi-tenant key
-    type        TEXT    NOT NULL,        -- string
-    source_id   BIGINT  NOT NULL,
-    target_id   BIGINT  NOT NULL,
-    time        BIGINT  NOT NULL,        -- unix epoch millis
-    position    BIGINT  NOT NULL,        -- monotonically increasing
-    attributes  JSONB   NOT NULL DEFAULT '{}'::jsonb,
+    tenant      BIGINT      NOT NULL,
+    type        TEXT        NOT NULL,
+    source_id   BIGINT      NOT NULL,
+    target_id   BIGINT      NOT NULL,
+    time        BIGINT      NOT NULL,          -- epoch-ms
+    position    BIGINT      NOT NULL,          -- monotonic
+    attributes  JSONB       NOT NULL DEFAULT '{}'::jsonb,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
 
     CONSTRAINT associations_pk PRIMARY KEY (tenant, type, source_id, target_id)
 );
 
--- Fast forward scans by source & position (GetAssociationsRequest)
 CREATE INDEX IF NOT EXISTS associations_srcpos_idx
     ON associations (tenant, type, source_id, position DESC);
 
--- Reverse lookup (fan-in queries) if you need them later
--- CREATE INDEX IF NOT EXISTS associations_target_idx
---     ON associations (tenant, type, target_id);
-
 CREATE INDEX IF NOT EXISTS associations_attrs_gin
-    ON associations
- USING gin (attributes);
+    ON associations USING gin (attributes);
 
 -----------------------------------------------------------------------
--- 4. Upsert helpers  (used by PutObject & CreateAssociation RPCs)
+-- 4. Upsert helpers
 --------------------------------------------------------------------
-/*--------------------------------------------------------------------
-  Upsert with optimistic concurrency
-  • Returns TRUE  if row was inserted or updated
-  • Returns FALSE if UPDATE skipped because version clash
---------------------------------------------------------------------*/
+/*--------------------------------------------------------------
+  tao_upsert_object
+  • Pass p_id = 0 or NULL to create (id auto-generated)
+  • On success returns (id, created)
+  • On version clash raises SQLSTATE 40001
+--------------------------------------------------------------*/
 CREATE OR REPLACE FUNCTION tao_upsert_object(
     p_tenant   BIGINT,
     p_type     INT,
-    p_id       BIGINT,
-    p_exp_ver  INT,       -- expected version from client
+    p_id       BIGINT,     -- 0 / NULL ⇒ insert
+    p_exp_ver  INT,        -- expected version
     p_attrs    JSONB
-) RETURNS BOOL LANGUAGE plpgsql AS $$
+) RETURNS TABLE (id BIGINT, created BOOLEAN) LANGUAGE plpgsql AS $$
 DECLARE
-    _touched  INT;
+    _created BOOLEAN := FALSE;
 BEGIN
-    -- 1) Try insert (initial version = 0)
-    INSERT INTO objects (tenant, type, id, version, attributes)
-         VALUES (p_tenant, p_type, p_id, 0, p_attrs)
-    ON CONFLICT (tenant, type, id) DO NOTHING;
+    /* ---------- INSERT path (no id supplied) ----------------------- */
+    IF p_id IS NULL OR p_id = 0 THEN
+        INSERT INTO objects (tenant, type, version, attributes)
+             VALUES (p_tenant, p_type, 0, p_attrs)
+          RETURNING objects.id INTO p_id;
+        _created := TRUE;
 
-    GET DIAGNOSTICS _touched = ROW_COUNT;
-    IF _touched > 0 THEN
-        RETURN TRUE;      -- brand-new row
+    ELSE
+        /* ---------- ensure row exists or create at explicit id ----- */
+        INSERT INTO objects (tenant, type, id, version, attributes)
+             VALUES (p_tenant, p_type, p_id, 0, p_attrs)
+        ON CONFLICT (tenant, type, id) DO NOTHING;
+
+        /* ---------- UPDATE path with optimistic check -------------- */
+        UPDATE objects
+           SET attributes = p_attrs,
+               updated_at = now(),
+               version    = version + 1
+         WHERE tenant  = p_tenant
+           AND type    = p_type
+           AND id      = p_id
+           AND version = p_exp_ver;
+
+        IF NOT FOUND THEN
+            RAISE EXCEPTION
+              'tao_upsert_object: version clash (tenant %, type %, id %)',
+              p_tenant, p_type, p_id
+              USING ERRCODE = '40001';
+        END IF;
     END IF;
 
-    -- 2) Try update, but only if versions match
-    UPDATE objects
-       SET attributes = p_attrs,
-           updated_at = now(),
-           version    = version + 1
-     WHERE tenant  = p_tenant
-       AND type    = p_type
-       AND id      = p_id
-       AND version = p_exp_ver;     -- optimistic check
-
-    GET DIAGNOSTICS _touched = ROW_COUNT;
-    RETURN _touched > 0;
+    RETURN QUERY SELECT p_id, _created;
 END;
 $$;
 
------------------------------------------------------------------------
--- 4. Upsert helper  (associations – type TEXT)
------------------------------------------------------------------------
+/*--------------------------------------------------------------
+  tao_upsert_association  (type = TEXT)
+--------------------------------------------------------------*/
 CREATE OR REPLACE FUNCTION tao_upsert_association(
     p_tenant     BIGINT,
     p_type       TEXT,
@@ -133,8 +138,10 @@ CREATE OR REPLACE FUNCTION tao_upsert_association(
     p_attrs      JSONB
 ) RETURNS VOID LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO associations (tenant, type, source_id, target_id, time, position, attributes)
-         VALUES (p_tenant, p_type, p_source, p_target, p_time, p_position, p_attrs)
+    INSERT INTO associations (tenant, type, source_id, target_id, time,
+                               position, attributes)
+         VALUES (p_tenant, p_type, p_source, p_target,
+                 p_time,   p_position, p_attrs)
     ON CONFLICT (tenant, type, source_id, target_id) DO UPDATE
         SET time       = p_time,
             position   = p_position,
@@ -144,7 +151,7 @@ END;
 $$;
 
 -----------------------------------------------------------------------
--- 5. Removal helpers  (soft-delete ready: just flip to DELETE)
+-- 5. Delete helpers (soft-delete ready)
 -----------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION tao_delete_object(
     p_tenant BIGINT,
@@ -160,9 +167,6 @@ BEGIN
 END;
 $$;
 
------------------------------------------------------------------------
--- 5. Delete helper  (associations – type TEXT)
------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION tao_delete_association(
     p_tenant BIGINT,
     p_type   TEXT,
@@ -180,7 +184,7 @@ END;
 $$;
 
 -----------------------------------------------------------------------
--- 6. Grant least-privilege roles (optional)
+-- 6. Least-privilege grants (optional)
 -----------------------------------------------------------------------
 -- GRANT SELECT, INSERT, UPDATE ON objects TO brother_rw;
 -- GRANT SELECT                    ON objects TO brother_ro;
