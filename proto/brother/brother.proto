@@ -59,7 +59,7 @@ message CreateAssociationResponse {
 }
 
 message RemoveAssociationRequest {
-  int32 type = 1;
+  string type = 1;
   int64 source_id = 2;
   int64 target_id = 3;
 }
@@ -69,7 +69,7 @@ message RemoveAssociationResponse {
 }
 
 message GetAssociationsRequest {
-  int32 type = 1;
+  string type = 1;
   int64 source_id = 2;
   int64 position_over = 3; // For pagination
   int32 limit = 4;
