@@ -62,10 +62,9 @@ message CreateAssociationResponse {
 }
 
 message RemoveAssociationRequest {
-  uint32 otype = 1;
-  uint64 src_id = 2;
-  string atype = 3;
-  uint64 tar_tid = 4;
+  string type = 1;
+  int64 source_id = 2;
+  int64 target_id = 3;
 }
 
 message RemoveAssociationResponse {
@@ -73,12 +72,10 @@ message RemoveAssociationResponse {
 }
 
 message GetAssociationsRequest {
-  uint32 otype = 1;
-  uint64 src_id = 2;
-  string atype = 3;
-  uint64 tar_id = 4; 
-  uint64 above = 5; // For pagination
-  uint32 limit = 6;
+  string type = 1;
+  int64 source_id = 2;
+  int64 position_over = 3; // For pagination
+  int32 limit = 4;
 }
 
 message GetAssociationsResponse {
